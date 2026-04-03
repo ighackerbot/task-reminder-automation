@@ -278,3 +278,83 @@ function dateLabel(d) {
 
 function getField(obj, keys) {
   for (var k of keys) { if (obj[k] !== undefined && obj[k] !== "") return obj[k]; }
+  return "";
+}
+
+// ═══════════════════════════════════════════
+//  RENDER
+// ═══════════════════════════════════════════
+function render() {
+  var total = tasks.length;
+  var pending = tasks.filter(t => getField(t,["Status","status"]) !== "Completed").length;
+  var completed = total - pending;
+  var sent = logs.filter(l => getField(l,["Status","status"]) === "Sent").length;
+  var failed = logs.filter(l => getField(l,["Status","status"]) === "Failed").length;
+
+  // Source badge
+  var badge = document.getElementById("dataSourceBadge");
+  if (isLive) { badge.textContent="Live Data"; badge.className="data-source-badge live"; }
+  else { badge.textContent="Sample Data"; badge.className="data-source-badge sample"; }
+
+  // Config banner
+  var banner = document.getElementById("configBanner");
+  if (!APPS_SCRIPT_URL) {
+    banner.innerHTML = '<div class="config-banner">⚠️ Dashboard is showing <strong>sample data</strong>. To connect live data:<br>1. Deploy <code>google-apps-script.gs</code> as a Web App from your Google Sheet<br>2. Paste the URL into <code>APPS_SCRIPT_URL</code> at the top of dashboard.html</div>';
+  } else { banner.innerHTML = ""; }
+
+  // Summary cards
+  var cards = [
+    {label:"Total Tasks",value:total,color:"purple",icon:"📋",sub:"All tracked tasks"},
+    {label:"Pending",value:pending,color:"yellow",icon:"⏳",sub:"Awaiting completion"},
+    {label:"Completed",value:completed,color:"green",icon:"✅",sub:"Successfully done"},
+    {label:"Messages Sent",value:sent,color:"blue",icon:"📨",sub:failed>0?failed+" failed":"WhatsApp reminders"}
+  ];
+  document.getElementById("summaryCards").innerHTML = cards.map(c =>
+    '<div class="summary-card"><div class="card-shine"></div><div class="card-header"><span class="card-label">'+c.label+'</span><div class="card-icon '+c.color+'">'+c.icon+'</div></div><div class="card-value '+c.color+'">'+c.value+'</div><div class="card-sub">'+c.sub+'</div></div>'
+  ).join("");
+
+  // Tasks table
+  document.getElementById("taskCount").textContent = total+" tasks";
+  document.getElementById("tasksBody").innerHTML = tasks.map(t => {
+    var name = getField(t,["Task Name","TaskName","task","name"]);
+    var owner = getField(t,["Owner","owner","Assigned To"]) || "—";
+    var phone = getField(t,["Phone","phone"]);
+    var due = getField(t,["Due Date","DueDate","due_date","dueDate"]);
+    var status = getField(t,["Status","status"]);
+    var sc = status==="Completed" ? "badge-completed" : "badge-pending";
+    var dl = dateLabel(due);
+    var db = "";
+    if (dl==="today") db='<span class="badge badge-today" style="margin-left:8px;font-size:10px">Today</span>';
+    if (dl==="tomorrow") db='<span class="badge badge-tomorrow" style="margin-left:8px;font-size:10px">Tomorrow</span>';
+    if (dl==="overdue") db='<span class="badge badge-overdue" style="margin-left:8px;font-size:10px">Overdue</span>';
+    return '<tr><td><span class="task-name">'+name+'</span></td><td><div class="owner-cell"><div class="avatar">'+initials(owner)+'</div>'+owner+'</div></td><td class="phone-cell hide-mobile">'+(phone?fmt(phone):"—")+'</td><td>'+due+db+'</td><td><span class="badge '+sc+'"><span class="badge-dot"></span>'+status+'</span></td></tr>';
+  }).join("");
+
+  // Logs table
+  document.getElementById("logCount").textContent = logs.length+" entries";
+  document.getElementById("logsBody").innerHTML = logs.map(l => {
+    var name = getField(l,["Task Name","TaskName","task","name"]);
+    var phone = getField(l,["Phone","phone"]);
+    var ts = getField(l,["Timestamp","timestamp"]);
+    var status = getField(l,["Status","status"]);
+    var sc = status==="Sent" ? "badge-sent" : "badge-failed";
+    return '<tr><td><span class="task-name">'+name+'</span></td><td class="phone-cell hide-mobile">'+(phone?fmt(phone):"—")+'</td><td>'+ts+'</td><td><span class="badge '+sc+'"><span class="badge-dot"></span>'+status+'</span></td></tr>';
+  }).join("");
+
+  // Timeline
+  var events = [];
+  events.push({time:"09:00",text:"⏰ <strong>Daily trigger</strong> fired — workflow started",dot:""});
+  events.push({time:"09:01",text:"📊 Read <strong>"+total+" tasks</strong> from Google Sheets",dot:""});
+  if (pending < total) events.push({time:"09:01",text:"🔍 Filtered to <strong>"+pending+" active</strong> tasks ("+(completed)+" completed)",dot:""});
+  logs.forEach(function(l,i){
+    var name = getField(l,["Task Name","TaskName","task"]);
+    var status = getField(l,["Status","status"]);
+    var dot = status==="Sent"?"green":"";
+    var icon = status==="Sent"?"📱":"❌";
+    events.push({time:"09:0"+(2+i),text:icon+' WhatsApp '+status.toLowerCase()+' — Task "<strong>'+name+'</strong>"',dot:dot});
+  });
+  events.push({time:"09:0"+(2+logs.length),text:"📋 <strong>"+logs.length+" log entries</strong> written to Sheet2",dot:"blue"});
+
+  document.getElementById("timeline").innerHTML = events.map(function(e,i){
+    return '<div class="timeline-item" style="animation-delay:'+(.3+i*.1)+'s"><div class="timeline-dot '+e.dot+'"></div><div class="timeline-content">'+e.text+'</div><div class="timeline-time">'+e.time+' AM</div></div>';
+  }).join("");
