@@ -173,3 +173,29 @@
       <div class="wf-step"><div class="wf-node"><span>📱</span> Send WhatsApp</div><span class="wf-arrow">→</span></div>
       <div class="wf-step"><div class="wf-node"><span>📋</span> Log Result</div></div>
     </div>
+
+    <section class="summary-grid" id="summaryCards"></section>
+
+    <section class="panels-grid">
+      <div class="panel">
+        <div class="panel-header"><div class="panel-title"><span>📋</span> Tasks</div><span class="panel-count" id="taskCount">—</span></div>
+        <div id="tasksContent">
+          <table class="data-table"><thead><tr><th>Task</th><th>Owner</th><th class="hide-mobile">Phone</th><th>Due Date</th><th>Status</th></tr></thead><tbody id="tasksBody"></tbody></table>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><div class="panel-title"><span>📨</span> Reminders Sent</div><span class="panel-count" id="logCount">—</span></div>
+        <div id="logsContent">
+          <table class="data-table"><thead><tr><th>Task</th><th class="hide-mobile">Phone</th><th>Timestamp</th><th>Status</th></tr></thead><tbody id="logsBody"></tbody></table>
+        </div>
+      </div>
+    </section>
+
+    <div class="timeline-panel">
+      <div class="timeline-title"><span>⚡</span> Activity Timeline</div>
+      <div class="timeline" id="timeline"></div>
+    </div>
+
+    <div class="last-updated" id="lastUpdated"></div>
+    <footer class="footer"><p>Built for <a href="https://github.com/ighackerbot" target="_blank">Cymasonic Labs</a> · Powered by n8n + Twilio + Google Sheets</p></footer>
+  </div>
