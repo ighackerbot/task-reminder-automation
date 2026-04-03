@@ -1,0 +1,538 @@
+{
+  "name": "Daily Task Reminder WhatsApp Notification System",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 9
+            }
+          ]
+        }
+      },
+      "id": "20f6aded-290b-40b7-bce1-d56208d8d242",
+      "name": "Daily 9 AM Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        256,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1UBkVXIV3-gW2X8Q4YUU_ksDP6pBxlEYzXeDJPwv641Q",
+          "mode": "list",
+          "cachedResultName": "assignment ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UBkVXIV3-gW2X8Q4YUU_ksDP6pBxlEYzXeDJPwv641Q/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UBkVXIV3-gW2X8Q4YUU_ksDP6pBxlEYzXeDJPwv641Q/edit#gid=0"
+        },
+        "options": {}
+      },
+      "id": "2bd0d75f-1625-4107-aca3-e1c6afa46df8",
+      "name": "Read Task Data",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        480,
+        400
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "aCmdwOONMy3tO7Ir",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "id-1",
+              "leftValue": "={{ $json.Status }}",
+              "rightValue": "Completed",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "121574b7-493f-40ea-974d-cfeeaeb21e15",
+      "name": "Filter Active Tasks",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        704,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Process all items and check due dates\nconst today = new Date();\ntoday.setHours(0, 0, 0, 0);\n\nconst tomorrow = new Date(today);\ntomorrow.setDate(tomorrow.getDate() + 1);\n\n// Process each item and add dueStatus field\nconst processedItems = $input.all().map(item => {\n  const dueDate = new Date(item.json['Due Date']);\n  dueDate.setHours(0, 0, 0, 0);\n  \n  let dueStatus = '';\n  \n  if (dueDate.getTime() === today.getTime()) {\n    dueStatus = 'today';\n  } else if (dueDate.getTime() === tomorrow.getTime()) {\n    dueStatus = 'tomorrow';\n  } else if (dueDate < today) {\n    dueStatus = 'overdue';\n  } else {\n    dueStatus = 'future';\n  }\n  \n  return {\n    json: {\n      ...item.json,\n      dueStatus: dueStatus\n    }\n  };\n});\n\nreturn processedItems;"
+      },
+      "id": "888bf47b-51a6-4641-922e-1d06b03d1873",
+      "name": "Check Due Date",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        928,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.dueStatus }}",
+                    "rightValue": "today",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "32b27654-ee59-4b9a-97b7-167f3faf7979"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.dueStatus }}",
+                    "rightValue": "tomorrow",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "e48d73bd-bd91-4421-9c34-8495b22af239"
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7aaddbcd-5aea-497e-bb53-436f9d701f0c",
+      "name": "Route by Due Date",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1152,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "message",
+              "value": "=Reminder: Task '{{ $json[\"Task Name\"] }}' is due TOMORROW",
+              "type": "string"
+            },
+            {
+              "id": "0b87d305-d883-40a7-9bab-ea5bdbc9758f",
+              "name": "Phone",
+              "value": "={{$json[\"Phone\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "877e39a3-8681-47f5-9bf9-57a021c24c1a",
+              "name": "TaskName ",
+              "value": "={{$json[\"Task Name\"]}}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "2d00baad-0717-4856-a679-e804c1f1cb0c",
+      "name": "Format Tomorrow Message",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1376,
+        496
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.twilio.com/2010-04-01/Accounts/AC41b2df8d4635738f26beee46b2e5561c/Messages.json",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "To",
+              "value": "=whatsapp:+{{$json[\"Phone\"]}}"
+            },
+            {
+              "name": "From",
+              "value": "whatsapp:+14155238886"
+            },
+            {
+              "name": "Body",
+              "value": "={{$json[\"message\"]}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "93056adf-c996-44d0-9743-93a63c96e2b8",
+      "name": "Send WhatsApp via Twilio",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1600,
+        400
+      ],
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "l7jLV9CEUrDOlGeq",
+          "name": "Twillio"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "Task Name",
+              "value": "={{ $json[\"Task Name\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "Phone",
+              "value": "={{ $json.Phone }}",
+              "type": "string"
+            },
+            {
+              "id": "id-3",
+              "name": "Timestamp",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "id-4",
+              "name": "Status",
+              "value": "Failed",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "24de8d0b-ff63-4a1c-b305-ed8b55ba4072",
+      "name": "Prepare Failed Log",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1824,
+        496
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1UBkVXIV3-gW2X8Q4YUU_ksDP6pBxlEYzXeDJPwv641Q",
+          "mode": "list",
+          "cachedResultName": "assignment ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UBkVXIV3-gW2X8Q4YUU_ksDP6pBxlEYzXeDJPwv641Q/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1249080941,
+          "mode": "list",
+          "cachedResultName": "Sheet2",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UBkVXIV3-gW2X8Q4YUU_ksDP6pBxlEYzXeDJPwv641Q/edit#gid=1249080941"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Task Name ",
+              "displayName": "Task Name ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Task Name",
+              "displayName": "Task Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "8f3d2bdd-c2f0-4053-a31d-e4aaff3fc6f2",
+      "name": "Log to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2048,
+        400
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "aCmdwOONMy3tO7Ir",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nfor (const item of items) {\n  const taskName = item.json[\"TaskName \"] || item.json[\"TaskName\"] || \"Unknown\";\n  item.json.message = `Reminder: Task \"${taskName}\" is due ${item.json[\"Due Date\"]}. Please ensure completion. - Cymasonic Labs`;\n}\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1360,
+        304
+      ],
+      "id": "89d97af0-25d0-482d-a284-19e7e7295e2b",
+      "name": "Format Today message"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nfor (const item of items) {\n  const body = item.json.body || \"\";\n  const to = item.json.to || \"\";\n  const match = body.match(/Task \"([^\"]+)\"/);\n  item.json[\"Task Name\"] = match ? match[1] : \"Unknown\";\n  item.json[\"Phone\"] = to.replace(\"whatsapp:+\", \"\");\n  item.json[\"Timestamp\"] = new Date().toISOString();\n  item.json[\"Status\"] = \"Sent\";\n}\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1824,
+        304
+      ],
+      "id": "4b20e481-da45-4e25-a523-05b9d382fb10",
+      "name": "Prepare Success Log"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Daily 9 AM Trigger": {
+      "main": [
+        [
+          {
+            "node": "Read Task Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Task Data": {
+      "main": [
+        [
+          {
+            "node": "Filter Active Tasks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Active Tasks": {
+      "main": [
+        [
+          {
+            "node": "Check Due Date",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Due Date": {
+      "main": [
+        [
+          {
+            "node": "Route by Due Date",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Due Date": {
+      "main": [
+        [
+          {
+            "node": "Format Today message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Format Tomorrow Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Tomorrow Message": {
+      "main": [
+        [
+          {
+            "node": "Send WhatsApp via Twilio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send WhatsApp via Twilio": {
+      "main": [
+        [
+          {
+            "node": "Prepare Success Log",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Failed Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Failed Log": {
+      "main": [
+        [
+          {
+            "node": "Log to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Today message": {
+      "main": [
+        [
+          {
+            "node": "Send WhatsApp via Twilio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Success Log": {
+      "main": [
+        [
+          {
+            "node": "Log to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "dfa69e0b-7363-4ab3-9a35-d612e9f7f82a",
+  "meta": {
+    "instanceId": "c7449b60188973920bc32d00253215b713571ec254778a37272ebb185ce43883"
+  },
+  "id": "C82wxcNq5NkyaoRN",
+  "tags": []
+}
