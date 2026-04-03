@@ -203,6 +203,8 @@ This project is an **n8n automation workflow** that reads task data from a Googl
 task-reminder-automation/
 ├── Daily Task Reminder WhatsApp Notification System (1).json   # n8n workflow export
 ├── README.md                                                    # Documentation
+├── dashboard.html                                               # Live monitoring dashboard
+├── google-apps-script.gs                                        # Google Apps Script API
 ├── n8n-workflow-screenshot.png                                  # n8n editor screenshot
 └── workflow-diagram.png                                         # Architecture diagram
 ```
