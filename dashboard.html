@@ -199,3 +199,32 @@
     <div class="last-updated" id="lastUpdated"></div>
     <footer class="footer"><p>Built for <a href="https://github.com/ighackerbot" target="_blank">Cymasonic Labs</a> · Powered by n8n + Twilio + Google Sheets</p></footer>
   </div>
+
+<script>
+// ═══════════════════════════════════════════
+//  CONFIGURATION — Set your Apps Script URL
+// ═══════════════════════════════════════════
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxFbtJhQ911l8rBHz8Kt804l4V4FVHXqZkOmCr9H5Q3GfUFiPH6wusVjC5nhnfg7EQagw/exec";
+const AUTO_REFRESH_MS = 60000; // Auto-refresh every 60 seconds
+
+// ═══════════════════════════════════════════
+//  SAMPLE DATA (used when no URL is set)
+// ═══════════════════════════════════════════
+const SAMPLE_TASKS = [
+  { "Task Name":"XYZ", "Owner":"Anuj", "Phone":"918717986200", "Due Date":"2026-04-03", "Status":"Pending" },
+  { "Task Name":"Submit Report", "Owner":"Anuj", "Phone":"918717986200", "Due Date":"2026-04-04", "Status":"Pending" },
+  { "Task Name":"Fix Bug", "Owner":"Anuj", "Phone":"918717986200", "Due Date":"2026-04-03", "Status":"Completed" }
+];
+const SAMPLE_LOGS = [
+  { "Task Name":"XYZ", "Phone":"918717986200", "Timestamp":"2026-04-03 09:30", "Status":"Sent" },
+  { "Task Name":"Submit Report", "Phone":"918717986200", "Timestamp":"2026-04-03 09:30", "Status":"Sent" }
+];
+
+// ═══════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════
+let tasks = [];
+let logs = [];
+let isLive = false;
+let refreshTimer = null;
+
