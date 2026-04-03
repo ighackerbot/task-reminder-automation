@@ -144,3 +144,32 @@
     @media(max-width:420px){.summary-grid{grid-template-columns:1fr}.hide-mobile{display:none}}
     ::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(139,92,246,.2);border-radius:3px}
   </style>
+</head>
+<body>
+  <div class="bg-mesh"><div class="orb"></div><div class="orb"></div><div class="orb"></div></div>
+  <div class="app">
+
+    <header class="header">
+      <div class="header-left">
+        <div class="logo-icon">📲</div>
+        <div class="header-title"><h1>Task Reminder Dashboard</h1><p>Cymasonic Labs — WhatsApp Automation</p></div>
+      </div>
+      <div class="header-right">
+        <span class="data-source-badge sample" id="dataSourceBadge">Sample Data</span>
+        <div class="live-badge"><span class="live-dot"></span>Workflow Active</div>
+        <div class="timestamp-badge" id="currentTime"></div>
+        <button class="refresh-btn" id="refreshBtn" title="Refresh Data">⟳</button>
+      </div>
+    </header>
+
+    <div id="configBanner"></div>
+
+    <div class="workflow-bar">
+      <div class="wf-step"><div class="wf-node"><span>⏰</span> 9 AM Trigger</div><span class="wf-arrow">→</span></div>
+      <div class="wf-step"><div class="wf-node"><span>📊</span> Read Sheets</div><span class="wf-arrow">→</span></div>
+      <div class="wf-step"><div class="wf-node"><span>🔍</span> Filter Tasks</div><span class="wf-arrow">→</span></div>
+      <div class="wf-step"><div class="wf-node"><span>📅</span> Check Dates</div><span class="wf-arrow">→</span></div>
+      <div class="wf-step"><div class="wf-node"><span>📝</span> Format Msg</div><span class="wf-arrow">→</span></div>
+      <div class="wf-step"><div class="wf-node"><span>📱</span> Send WhatsApp</div><span class="wf-arrow">→</span></div>
+      <div class="wf-step"><div class="wf-node"><span>📋</span> Log Result</div></div>
+    </div>
