@@ -228,3 +228,53 @@ let logs = [];
 let isLive = false;
 let refreshTimer = null;
 
+// ═══════════════════════════════════════════
+//  DATA FETCHING
+// ═══════════════════════════════════════════
+async function fetchData() {
+  if (!APPS_SCRIPT_URL) {
+    tasks = SAMPLE_TASKS;
+    logs = SAMPLE_LOGS;
+    isLive = false;
+    return;
+  }
+
+  try {
+    const res = await fetch(APPS_SCRIPT_URL);
+    const text = await res.text();
+    const json = JSON.parse(text);
+    if (json.success) {
+      tasks = json.data.tasks || [];
+      logs = json.data.logs || [];
+      isLive = true;
+    } else {
+      throw new Error(json.error || "API error");
+    }
+  } catch (err) {
+    console.error("Fetch failed:", err.message);
+    if (tasks.length === 0) {
+      tasks = SAMPLE_TASKS;
+      logs = SAMPLE_LOGS;
+    }
+    isLive = false;
+  }
+}
+
+// ═══════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════
+function fmt(p) { return "+"+p.slice(0,2)+" "+p.slice(2,7)+" "+p.slice(7); }
+function initials(n) { return (n||"?").split(" ").map(w=>w[0]).join("").toUpperCase().slice(0,2); }
+function today() { var d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function tomorrow() { var d=new Date(); d.setDate(d.getDate()+1); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+
+function dateLabel(d) {
+  if (!d) return "";
+  var ds = d.slice(0,10);
+  if (ds === today()) return "today";
+  if (ds === tomorrow()) return "tomorrow";
+  return ds < today() ? "overdue" : "future";
+}
+
+function getField(obj, keys) {
+  for (var k of keys) { if (obj[k] !== undefined && obj[k] !== "") return obj[k]; }
