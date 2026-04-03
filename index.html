@@ -3,395 +3,1369 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Task Reminder Automation Dashboard — Live monitoring for WhatsApp reminders." />
-  <title>Task Reminder Dashboard — Cymasonic Labs</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <meta name="description" content="Task Reminder Automation Command Center for Cymasonic Labs." />
+  <title>Task Reminder Command Center</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg-primary:#0a0a12;--bg-secondary:#12121e;--bg-card:rgba(22,22,38,.7);
-      --bg-card-hover:rgba(30,30,52,.85);--border-card:rgba(128,90,213,.15);
-      --border-card-hover:rgba(128,90,213,.35);
-      --purple-200:#d8b4fe;--purple-300:#c084fc;--purple-400:#a855f7;
-      --purple-500:#8b5cf6;--purple-600:#7c3aed;--purple-700:#6d28d9;--purple-900:#4c1d95;
-      --green-400:#4ade80;--green-500:#22c55e;--green-bg:rgba(34,197,94,.12);--green-border:rgba(34,197,94,.3);
-      --yellow-400:#facc15;--yellow-bg:rgba(234,179,8,.12);--yellow-border:rgba(234,179,8,.3);
-      --red-400:#f87171;--red-bg:rgba(239,68,68,.12);--red-border:rgba(239,68,68,.3);
-      --blue-400:#60a5fa;--blue-bg:rgba(59,130,246,.12);--blue-border:rgba(59,130,246,.3);
-      --text-primary:#f1f1f6;--text-secondary:#a1a1b5;--text-muted:#6b6b80;
-      --font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-      --radius-sm:8px;--radius-md:12px;--radius-lg:16px;
-      --transition:all .3s cubic-bezier(.4,0,.2,1);
+      --bg: #07030f;
+      --bg-elevated: #12091f;
+      --bg-panel: rgba(18, 9, 31, 0.84);
+      --bg-panel-strong: rgba(22, 11, 36, 0.94);
+      --bg-soft: rgba(139, 92, 246, 0.12);
+      --line: rgba(139, 92, 246, 0.2);
+      --line-strong: rgba(167, 139, 250, 0.34);
+      --text: #f5f1ff;
+      --text-soft: #c5b8e8;
+      --text-muted: #8c7cae;
+      --brand: #8b5cf6;
+      --brand-soft: rgba(139, 92, 246, 0.16);
+      --accent: #a78bfa;
+      --accent-soft: rgba(167, 139, 250, 0.16);
+      --warn: #c084fc;
+      --warn-soft: rgba(192, 132, 252, 0.14);
+      --danger: #f472b6;
+      --danger-soft: rgba(244, 114, 182, 0.14);
+      --shadow: 0 24px 60px rgba(3, 0, 10, 0.45);
+      --radius-lg: 24px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
+      --font-sans: "Manrope", sans-serif;
+      --font-mono: "IBM Plex Mono", monospace;
+      --transition: 180ms ease;
     }
-    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-    html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
-    body{font-family:var(--font-family);background:var(--bg-primary);color:var(--text-primary);min-height:100vh;overflow-x:hidden}
 
-    .bg-mesh{position:fixed;inset:0;z-index:0;pointer-events:none}
-    .bg-mesh .orb{position:absolute;border-radius:50%;filter:blur(100px);opacity:.3;animation:float 20s ease-in-out infinite}
-    .bg-mesh .orb:nth-child(1){width:500px;height:500px;background:var(--purple-700);top:-10%;left:-5%}
-    .bg-mesh .orb:nth-child(2){width:400px;height:400px;background:var(--purple-900);bottom:-15%;right:-8%;animation-delay:-7s;animation-duration:25s}
-    .bg-mesh .orb:nth-child(3){width:300px;height:300px;background:#1e1b4b;top:40%;left:50%;animation-delay:-14s;animation-duration:30s}
-    @keyframes float{0%,100%{transform:translate(0,0) scale(1)}25%{transform:translate(50px,-30px) scale(1.05)}50%{transform:translate(-30px,50px) scale(.95)}75%{transform:translate(40px,20px) scale(1.02)}}
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      min-height: 100vh;
+      font-family: var(--font-sans);
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(139, 92, 246, 0.22), transparent 28%),
+        radial-gradient(circle at top right, rgba(167, 139, 250, 0.16), transparent 24%),
+        linear-gradient(180deg, #07030f 0%, #0b0415 48%, #07020e 100%);
+      overflow-x: hidden;
+    }
 
-    .app{position:relative;z-index:1;max-width:1280px;margin:0 auto;padding:24px 20px 60px}
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        radial-gradient(circle, rgba(139, 92, 246, 0.3) 1px, transparent 1.5px);
+      background-size: 92px 92px;
+      mask-image: linear-gradient(180deg, rgba(255, 255, 255, 0.55), transparent 90%);
+      opacity: 0.3;
+    }
 
-    /* Header */
-    .header{display:flex;align-items:center;justify-content:space-between;margin-bottom:36px;padding-bottom:24px;border-bottom:1px solid rgba(128,90,213,.1);flex-wrap:wrap;gap:16px}
-    .header-left{display:flex;align-items:center;gap:16px}
-    .logo-icon{width:48px;height:48px;background:linear-gradient(135deg,var(--purple-600),var(--purple-400));border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 20px rgba(139,92,246,.3);flex-shrink:0}
-    .header-title h1{font-size:22px;font-weight:700;letter-spacing:-.3px;background:linear-gradient(135deg,var(--text-primary),var(--purple-200));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-    .header-title p{font-size:13px;color:var(--text-muted);margin-top:2px}
-    .header-right{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-    .live-badge{display:flex;align-items:center;gap:8px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);padding:6px 14px;border-radius:100px;font-size:12px;font-weight:500;color:var(--green-400)}
-    .live-dot{width:8px;height:8px;background:var(--green-400);border-radius:50%;animation:pulse-dot 2s ease-in-out infinite}
-    @keyframes pulse-dot{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(74,222,128,.4)}50%{opacity:.6;box-shadow:0 0 0 6px rgba(74,222,128,0)}}
-    .timestamp-badge{font-size:12px;color:var(--text-muted);background:rgba(255,255,255,.04);padding:6px 14px;border-radius:100px;border:1px solid rgba(255,255,255,.06)}
-    .refresh-btn{width:36px;height:36px;border-radius:50%;border:1px solid rgba(128,90,213,.2);background:rgba(128,90,213,.08);color:var(--purple-300);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:var(--transition)}
-    .refresh-btn:hover{background:rgba(128,90,213,.2);border-color:rgba(128,90,213,.4);transform:rotate(90deg)}
-    .refresh-btn.spinning{animation:spin .8s linear}
-    @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-    .data-source-badge{font-size:11px;padding:4px 10px;border-radius:100px;font-weight:500}
-    .data-source-badge.live{background:var(--green-bg);border:1px solid var(--green-border);color:var(--green-400)}
-    .data-source-badge.sample{background:var(--yellow-bg);border:1px solid var(--yellow-border);color:var(--yellow-400)}
+    a { color: inherit; }
+    button { font: inherit; }
 
-    /* Workflow bar */
-    .workflow-bar{display:flex;align-items:center;justify-content:center;gap:0;padding:20px 24px;margin-bottom:32px;background:var(--bg-card);backdrop-filter:blur(20px);border:1px solid var(--border-card);border-radius:var(--radius-lg);overflow-x:auto;animation:card-in .6s cubic-bezier(.16,1,.3,1) .05s backwards}
-    .wf-step{display:flex;align-items:center;flex-shrink:0}
-    .wf-node{display:flex;align-items:center;gap:8px;padding:8px 16px;background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.18);border-radius:100px;font-size:12px;font-weight:500;color:var(--purple-200);white-space:nowrap;transition:var(--transition)}
-    .wf-node:hover{background:rgba(139,92,246,.15);border-color:rgba(139,92,246,.35);transform:scale(1.05)}
-    .wf-arrow{color:var(--text-muted);font-size:16px;padding:0 6px;flex-shrink:0}
-    @keyframes card-in{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    .app {
+      position: relative;
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 28px;
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: 24px;
+    }
 
-    /* Summary cards */
-    .summary-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:32px}
-    .summary-card{background:var(--bg-card);backdrop-filter:blur(20px);border:1px solid var(--border-card);border-radius:var(--radius-lg);padding:24px;transition:var(--transition);position:relative;overflow:hidden;animation:card-in .6s cubic-bezier(.16,1,.3,1) backwards}
-    .summary-card:nth-child(1){animation-delay:.05s}.summary-card:nth-child(2){animation-delay:.1s}.summary-card:nth-child(3){animation-delay:.15s}.summary-card:nth-child(4){animation-delay:.2s}
-    .summary-card:hover{background:var(--bg-card-hover);border-color:var(--border-card-hover);transform:translateY(-2px);box-shadow:0 0 60px rgba(139,92,246,.08)}
-    .summary-card .card-shine{position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(139,92,246,.3),transparent);opacity:0;transition:opacity .3s}
-    .summary-card:hover .card-shine{opacity:1}
-    .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
-    .card-label{font-size:13px;font-weight:500;color:var(--text-secondary);letter-spacing:.2px}
-    .card-icon{width:40px;height:40px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;font-size:18px}
-    .card-icon.purple{background:rgba(139,92,246,.15)}.card-icon.yellow{background:var(--yellow-bg)}.card-icon.green{background:var(--green-bg)}.card-icon.blue{background:var(--blue-bg)}
-    .card-value{font-size:36px;font-weight:800;letter-spacing:-1px;line-height:1;margin-bottom:6px}
-    .card-value.purple{color:var(--purple-300)}.card-value.yellow{color:var(--yellow-400)}.card-value.green{color:var(--green-400)}.card-value.blue{color:var(--blue-400)}
-    .card-sub{font-size:12px;color:var(--text-muted)}
+    .sidebar,
+    .panel,
+    .hero,
+    .kpi-card,
+    .table-panel,
+    .timeline-panel {
+      background: var(--bg-panel);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(20px);
+    }
 
-    /* Panels */
-    .panels-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:32px}
-    .panel{background:var(--bg-card);backdrop-filter:blur(20px);border:1px solid var(--border-card);border-radius:var(--radius-lg);overflow:hidden;animation:card-in .6s cubic-bezier(.16,1,.3,1) .25s backwards}
-    .panel-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid rgba(128,90,213,.08)}
-    .panel-title{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:600}
-    .panel-count{font-size:12px;font-weight:500;padding:3px 10px;border-radius:100px;background:rgba(139,92,246,.12);color:var(--purple-300)}
+    .sidebar {
+      position: sticky;
+      top: 24px;
+      align-self: start;
+      border-radius: 28px;
+      padding: 24px;
+      overflow: hidden;
+    }
 
-    /* Table */
-    .data-table{width:100%;border-collapse:collapse}
-    .data-table thead th{text-align:left;font-size:11px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.8px;padding:14px 24px;border-bottom:1px solid rgba(128,90,213,.06);background:rgba(0,0,0,.15)}
-    .data-table tbody tr{transition:var(--transition)}
-    .data-table tbody tr:hover{background:rgba(139,92,246,.04)}
-    .data-table tbody td{padding:14px 24px;font-size:13px;color:var(--text-secondary);border-bottom:1px solid rgba(255,255,255,.03);vertical-align:middle}
-    .data-table tbody tr:last-child td{border-bottom:none}
-    .task-name{font-weight:600;color:var(--text-primary)}
-    .owner-cell{display:flex;align-items:center;gap:8px}
-    .avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--purple-600),var(--purple-400));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:white;flex-shrink:0}
-    .phone-cell{font-family:'SF Mono','Fira Code',monospace;font-size:12px;color:var(--text-muted)}
+    .sidebar::after {
+      content: "";
+      position: absolute;
+      inset: auto 0 0;
+      height: 140px;
+      background: linear-gradient(180deg, transparent, rgba(139, 92, 246, 0.12));
+      pointer-events: none;
+    }
 
-    /* Badges */
-    .badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:100px;font-size:12px;font-weight:600;letter-spacing:.2px}
-    .badge-dot{width:6px;height:6px;border-radius:50%}
-    .badge-pending{background:var(--yellow-bg);border:1px solid var(--yellow-border);color:var(--yellow-400)}.badge-pending .badge-dot{background:var(--yellow-400)}
-    .badge-completed{background:var(--green-bg);border:1px solid var(--green-border);color:var(--green-400)}.badge-completed .badge-dot{background:var(--green-400)}
-    .badge-sent{background:var(--green-bg);border:1px solid var(--green-border);color:var(--green-400)}.badge-sent .badge-dot{background:var(--green-400)}
-    .badge-failed{background:var(--red-bg);border:1px solid var(--red-border);color:var(--red-400)}.badge-failed .badge-dot{background:var(--red-400)}
-    .badge-today{background:rgba(139,92,246,.12);border:1px solid rgba(139,92,246,.3);color:var(--purple-300)}
-    .badge-tomorrow{background:var(--blue-bg);border:1px solid var(--blue-border);color:var(--blue-400)}
-    .badge-overdue{background:var(--red-bg);border:1px solid var(--red-border);color:var(--red-400)}
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 28px;
+    }
 
-    /* Timeline */
-    .timeline-panel{background:var(--bg-card);backdrop-filter:blur(20px);border:1px solid var(--border-card);border-radius:var(--radius-lg);padding:24px;animation:card-in .6s cubic-bezier(.16,1,.3,1) .35s backwards}
-    .timeline-title{font-size:15px;font-weight:600;margin-bottom:20px;display:flex;align-items:center;gap:10px}
-    .timeline{position:relative;padding-left:28px}
-    .timeline::before{content:'';position:absolute;left:8px;top:4px;bottom:4px;width:2px;background:linear-gradient(to bottom,var(--purple-600),rgba(139,92,246,.1));border-radius:2px}
-    .timeline-item{position:relative;padding-bottom:24px;animation:fade-slide .5s ease backwards}
-    .timeline-item:last-child{padding-bottom:0}
-    @keyframes fade-slide{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:translateX(0)}}
-    .timeline-dot{position:absolute;left:-24px;top:4px;width:14px;height:14px;border-radius:50%;border:2px solid var(--purple-500);background:var(--bg-primary)}
-    .timeline-dot.green{border-color:var(--green-500)}.timeline-dot.blue{border-color:var(--blue-400)}
-    .timeline-content{font-size:13px;color:var(--text-secondary);line-height:1.6}
-    .timeline-content strong{color:var(--text-primary);font-weight:600}
-    .timeline-time{font-size:11px;color:var(--text-muted);margin-top:4px}
+    .brand-mark {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, #8b5cf6, #a78bfa);
+      color: #f5f1ff;
+      box-shadow: 0 0 24px rgba(139, 92, 246, 0.35);
+      font-size: 24px;
+      font-weight: 800;
+    }
 
-    /* Loading */
-    .loading-overlay{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px;gap:16px}
-    .spinner{width:32px;height:32px;border:3px solid rgba(139,92,246,.15);border-top-color:var(--purple-500);border-radius:50%;animation:spin .8s linear infinite}
-    .loading-text{font-size:13px;color:var(--text-muted)}
-    .error-msg{text-align:center;padding:32px;color:var(--red-400);font-size:13px}
+    .brand h1 { font-size: 18px; font-weight: 800; letter-spacing: -0.03em; }
+    .brand p { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
 
-    /* Last updated */
-    .last-updated{text-align:center;font-size:11px;color:var(--text-muted);margin-top:12px;margin-bottom:8px}
+    .nav-group {
+      padding: 18px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      margin-bottom: 16px;
+    }
 
-    /* Footer */
-    .footer{text-align:center;padding:24px 0;border-top:1px solid rgba(128,90,213,.08);margin-top:16px}
-    .footer p{font-size:12px;color:var(--text-muted)}.footer a{color:var(--purple-400);text-decoration:none}
+    .nav-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
 
-    /* Config banner */
-    .config-banner{background:rgba(234,179,8,.08);border:1px solid var(--yellow-border);border-radius:var(--radius-md);padding:16px 20px;margin-bottom:24px;font-size:13px;color:var(--yellow-400);line-height:1.7}
-    .config-banner code{background:rgba(0,0,0,.3);padding:2px 6px;border-radius:4px;font-size:12px}
+    .nav-item,
+    .mini-stat {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 0;
+      font-size: 14px;
+      color: var(--text-soft);
+    }
 
-    /* Responsive */
-    @media(max-width:1024px){.summary-grid{grid-template-columns:repeat(2,1fr)}.panels-grid{grid-template-columns:1fr}}
-    @media(max-width:640px){.app{padding:16px 12px 40px}.header{flex-direction:column;align-items:flex-start}.summary-grid{grid-template-columns:1fr 1fr;gap:10px}.summary-card{padding:18px}.card-value{font-size:28px}.header-title h1{font-size:18px}.data-table thead th,.data-table tbody td{padding:10px 14px;font-size:12px}.workflow-bar{justify-content:flex-start;padding:14px 16px}.wf-node{padding:6px 10px;font-size:11px}}
-    @media(max-width:420px){.summary-grid{grid-template-columns:1fr}.hide-mobile{display:none}}
-    ::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(139,92,246,.2);border-radius:3px}
+    .nav-item strong,
+    .mini-stat strong { color: var(--text); font-weight: 700; }
+
+    .nav-chip {
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      background: var(--bg-soft);
+      border: 1px solid var(--line);
+    }
+
+    .sidebar-note {
+      position: relative;
+      z-index: 1;
+      margin-top: 18px;
+      padding: 18px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.14), rgba(76, 29, 149, 0.18));
+      border: 1px solid rgba(167, 139, 250, 0.16);
+    }
+
+    .sidebar-note h2 { font-size: 14px; margin-bottom: 8px; }
+    .sidebar-note p { font-size: 13px; line-height: 1.65; color: var(--text-soft); }
+
+    .main {
+      display: grid;
+      gap: 22px;
+    }
+
+    .hero {
+      border-radius: 30px;
+      padding: 28px;
+      background:
+        linear-gradient(140deg, rgba(139, 92, 246, 0.14), transparent 34%),
+        linear-gradient(220deg, rgba(76, 29, 149, 0.22), transparent 38%),
+        var(--bg-panel-strong);
+    }
+
+    .hero-top,
+    .hero-bottom,
+    .panel-head,
+    .table-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(167, 139, 250, 0.26);
+      background: rgba(139, 92, 246, 0.1);
+      color: #d7c8ff;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .hero h2 {
+      max-width: 760px;
+      font-size: clamp(28px, 4vw, 42px);
+      line-height: 1.06;
+      letter-spacing: -0.05em;
+      margin-bottom: 10px;
+    }
+
+    .hero p {
+      max-width: 760px;
+      color: var(--text-soft);
+      font-size: 15px;
+      line-height: 1.75;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .status-pill,
+    .source-pill,
+    .meta-pill,
+    .risk-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text-soft);
+    }
+
+    .status-pill.live { color: #d9ccff; background: var(--brand-soft); border-color: rgba(139, 92, 246, 0.28); }
+    .status-pill.sample { color: #e7d8ff; background: var(--warn-soft); border-color: rgba(192, 132, 252, 0.24); }
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 0 6px rgba(139, 92, 246, 0.12);
+    }
+
+    .refresh-btn {
+      width: 44px;
+      height: 44px;
+      border: 0;
+      border-radius: 14px;
+      color: #f8f5ff;
+      background: linear-gradient(135deg, #7c3aed, #a855f7);
+      box-shadow: 0 12px 30px rgba(124, 58, 237, 0.28);
+      cursor: pointer;
+      transition: transform var(--transition), filter var(--transition);
+    }
+
+    .refresh-btn:hover { transform: translateY(-1px); filter: brightness(1.04); }
+    .refresh-btn.spinning { animation: spin 0.8s linear; }
+
+    .hero-bottom {
+      margin-top: 28px;
+      padding-top: 22px;
+      border-top: 1px solid rgba(139, 92, 246, 0.16);
+    }
+
+    .hero-stat {
+      min-width: 180px;
+    }
+
+    .hero-stat-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 8px;
+    }
+
+    .hero-stat-value {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      margin-bottom: 6px;
+    }
+
+    .hero-stat-note {
+      font-size: 13px;
+      color: var(--text-soft);
+    }
+
+    .config-banner {
+      border-radius: 20px;
+      padding: 18px 20px;
+      border: 1px solid rgba(192, 132, 252, 0.2);
+      background: var(--warn-soft);
+      color: #eadfff;
+      font-size: 13px;
+      line-height: 1.75;
+    }
+
+    .config-banner code {
+      font-family: var(--font-mono);
+      background: rgba(255, 255, 255, 0.06);
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .kpi-card {
+      border-radius: 22px;
+      padding: 22px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi-card::after {
+      content: "";
+      position: absolute;
+      inset: auto -50px -50px auto;
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(139, 92, 246, 0.18), transparent 70%);
+      pointer-events: none;
+    }
+
+    .kpi-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .kpi-title {
+      font-size: 13px;
+      color: var(--text-soft);
+      font-weight: 700;
+    }
+
+    .kpi-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .kpi-value {
+      font-size: 36px;
+      line-height: 1;
+      letter-spacing: -0.06em;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .kpi-meta {
+      font-size: 13px;
+      color: var(--text-soft);
+      line-height: 1.7;
+    }
+
+    .kpi-card.brand .kpi-value { color: #d8c8ff; }
+    .kpi-card.accent .kpi-value { color: #c4b5fd; }
+    .kpi-card.warn .kpi-value { color: #e9d5ff; }
+    .kpi-card.danger .kpi-value { color: #f9a8d4; }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1.25fr 0.95fr;
+      gap: 20px;
+    }
+
+    .panel,
+    .timeline-panel,
+    .table-panel {
+      border-radius: 24px;
+      padding: 22px;
+    }
+
+    .panel-title-wrap h3,
+    .table-title-wrap h3 {
+      font-size: 18px;
+      letter-spacing: -0.03em;
+      margin-bottom: 4px;
+    }
+
+    .panel-title-wrap p,
+    .table-title-wrap p {
+      font-size: 13px;
+      color: var(--text-soft);
+    }
+
+    .panel-head {
+      margin-bottom: 20px;
+    }
+
+    .risk-list,
+    .team-list,
+    .metric-list,
+    .timeline {
+      display: grid;
+      gap: 14px;
+    }
+
+    .risk-item,
+    .team-item,
+    .metric-item,
+    .timeline-item {
+      padding: 16px 18px;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .risk-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 14px;
+    }
+
+    .risk-item h4,
+    .metric-item h4,
+    .team-item h4 {
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .risk-item p,
+    .metric-item p,
+    .team-item p,
+    .timeline-item p {
+      font-size: 13px;
+      line-height: 1.65;
+      color: var(--text-soft);
+    }
+
+    .risk-pill.high { color: #f9a8d4; background: var(--danger-soft); border-color: rgba(244, 114, 182, 0.24); }
+    .risk-pill.medium { color: #e9d5ff; background: var(--warn-soft); border-color: rgba(192, 132, 252, 0.24); }
+    .risk-pill.low { color: #d8c8ff; background: var(--brand-soft); border-color: rgba(139, 92, 246, 0.24); }
+
+    .metric-row,
+    .team-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .metric-row:last-child,
+    .team-row:last-child { margin-bottom: 0; }
+
+    .progress {
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .progress > span {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #7c3aed, #a78bfa);
+    }
+
+    .progress.warn > span { background: linear-gradient(90deg, #9333ea, #c084fc); }
+    .progress.danger > span { background: linear-gradient(90deg, #ec4899, #f472b6); }
+
+    .table-panel {
+      padding-bottom: 10px;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 18px;
+      margin-top: 18px;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 680px;
+    }
+
+    .data-table thead th {
+      padding: 14px 16px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      background: rgba(255, 255, 255, 0.03);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .data-table tbody td {
+      padding: 16px;
+      font-size: 13px;
+      color: var(--text-soft);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      vertical-align: middle;
+    }
+
+    .data-table tbody tr:hover {
+      background: rgba(139, 92, 246, 0.06);
+    }
+
+    .task-name {
+      display: block;
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .task-sub {
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+
+    .owner-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      font-weight: 800;
+      color: #f8f5ff;
+      background: linear-gradient(135deg, #7c3aed, #a78bfa);
+      flex-shrink: 0;
+    }
+
+    .mono {
+      font-family: var(--font-mono);
+      font-size: 12px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      border: 1px solid transparent;
+    }
+
+    .badge::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .badge.pending,
+    .badge.in-progress { color: #e9d5ff; background: var(--warn-soft); border-color: rgba(192, 132, 252, 0.24); }
+    .badge.completed,
+    .badge.sent { color: #d8c8ff; background: var(--brand-soft); border-color: rgba(139, 92, 246, 0.24); }
+    .badge.failed,
+    .badge.overdue { color: #f9a8d4; background: var(--danger-soft); border-color: rgba(244, 114, 182, 0.24); }
+    .badge.today { color: #c4b5fd; background: var(--accent-soft); border-color: rgba(167, 139, 250, 0.24); }
+    .badge.tomorrow,
+    .badge.future { color: #ddd6fe; background: rgba(76, 29, 149, 0.22); border-color: rgba(124, 58, 237, 0.24); }
+
+    .table-count,
+    .panel-count {
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--text-soft);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .timeline-item {
+      display: grid;
+      grid-template-columns: 42px 1fr auto;
+      align-items: start;
+      gap: 14px;
+    }
+
+    .timeline-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      font-size: 17px;
+    }
+
+    .timeline-time {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      margin-top: 2px;
+    }
+
+    .footer {
+      padding: 10px 4px 24px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 1200px) {
+      .app { grid-template-columns: 1fr; }
+      .sidebar { position: relative; top: 0; }
+      .content-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 900px) {
+      .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 640px) {
+      .app { padding: 14px; gap: 16px; }
+      .sidebar,
+      .hero,
+      .panel,
+      .timeline-panel,
+      .table-panel,
+      .kpi-card { border-radius: 20px; }
+      .hero { padding: 22px; }
+      .kpi-grid { grid-template-columns: 1fr; }
+      .hero-bottom { gap: 18px; }
+      .timeline-item { grid-template-columns: 42px 1fr; }
+      .timeline-time { grid-column: 2; }
+    }
   </style>
 </head>
 <body>
-  <div class="bg-mesh"><div class="orb"></div><div class="orb"></div><div class="orb"></div></div>
   <div class="app">
-
-    <header class="header">
-      <div class="header-left">
-        <div class="logo-icon">📲</div>
-        <div class="header-title"><h1>Task Reminder Dashboard</h1><p>Cymasonic Labs — WhatsApp Automation</p></div>
-      </div>
-      <div class="header-right">
-        <span class="data-source-badge sample" id="dataSourceBadge">Sample Data</span>
-        <div class="live-badge"><span class="live-dot"></span>Workflow Active</div>
-        <div class="timestamp-badge" id="currentTime"></div>
-        <button class="refresh-btn" id="refreshBtn" title="Refresh Data">⟳</button>
-      </div>
-    </header>
-
-    <div id="configBanner"></div>
-
-    <div class="workflow-bar">
-      <div class="wf-step"><div class="wf-node"><span>⏰</span> 9 AM Trigger</div><span class="wf-arrow">→</span></div>
-      <div class="wf-step"><div class="wf-node"><span>📊</span> Read Sheets</div><span class="wf-arrow">→</span></div>
-      <div class="wf-step"><div class="wf-node"><span>🔍</span> Filter Tasks</div><span class="wf-arrow">→</span></div>
-      <div class="wf-step"><div class="wf-node"><span>📅</span> Check Dates</div><span class="wf-arrow">→</span></div>
-      <div class="wf-step"><div class="wf-node"><span>📝</span> Format Msg</div><span class="wf-arrow">→</span></div>
-      <div class="wf-step"><div class="wf-node"><span>📱</span> Send WhatsApp</div><span class="wf-arrow">→</span></div>
-      <div class="wf-step"><div class="wf-node"><span>📋</span> Log Result</div></div>
-    </div>
-
-    <section class="summary-grid" id="summaryCards"></section>
-
-    <section class="panels-grid">
-      <div class="panel">
-        <div class="panel-header"><div class="panel-title"><span>📋</span> Tasks</div><span class="panel-count" id="taskCount">—</span></div>
-        <div id="tasksContent">
-          <table class="data-table"><thead><tr><th>Task</th><th>Owner</th><th class="hide-mobile">Phone</th><th>Due Date</th><th>Status</th></tr></thead><tbody id="tasksBody"></tbody></table>
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark">C</div>
+        <div>
+          <h1>Command Center</h1>
+          <p>Cymasonic Labs automation ops</p>
         </div>
       </div>
-      <div class="panel">
-        <div class="panel-header"><div class="panel-title"><span>📨</span> Reminders Sent</div><span class="panel-count" id="logCount">—</span></div>
-        <div id="logsContent">
-          <table class="data-table"><thead><tr><th>Task</th><th class="hide-mobile">Phone</th><th>Timestamp</th><th>Status</th></tr></thead><tbody id="logsBody"></tbody></table>
-        </div>
+
+      <div class="nav-group">
+        <div class="nav-label">System Status</div>
+        <div class="nav-item"><span>Workflow engine</span><strong id="workflowState">Monitoring</strong></div>
+        <div class="nav-item"><span>Data source</span><span class="nav-chip" id="navDataMode">Sample</span></div>
+        <div class="nav-item"><span>Refresh cadence</span><strong id="refreshCadence">60 sec</strong></div>
       </div>
-    </section>
 
-    <div class="timeline-panel">
-      <div class="timeline-title"><span>⚡</span> Activity Timeline</div>
-      <div class="timeline" id="timeline"></div>
-    </div>
+      <div class="nav-group">
+        <div class="nav-label">Operational Snapshot</div>
+        <div class="mini-stat"><span>Tasks due today</span><strong id="navDueToday">0</strong></div>
+        <div class="mini-stat"><span>Overdue tasks</span><strong id="navOverdue">0</strong></div>
+        <div class="mini-stat"><span>Delivery success</span><strong id="navSuccessRate">0%</strong></div>
+      </div>
 
-    <div class="last-updated" id="lastUpdated"></div>
-    <footer class="footer"><p>Built for <a href="https://github.com/ighackerbot" target="_blank">Cymasonic Labs</a> · Powered by n8n + Twilio + Google Sheets</p></footer>
+      <div class="nav-group">
+        <div class="nav-label">Pipeline</div>
+        <div class="nav-item"><span>Schedule trigger</span><strong>09:00 daily</strong></div>
+        <div class="nav-item"><span>Task source</span><strong>Google Sheets</strong></div>
+        <div class="nav-item"><span>Message transport</span><strong>Twilio WhatsApp</strong></div>
+        <div class="nav-item"><span>Audit log</span><strong>Sheet2 append</strong></div>
+      </div>
+
+      <div class="sidebar-note">
+        <h2>Ops Guidance</h2>
+        <p id="sidebarGuidance">Dashboard is ready. Connect the Apps Script endpoint to replace sample records with live operational telemetry.</p>
+      </div>
+    </aside>
+
+    <main class="main">
+      <section class="hero">
+        <div class="hero-top">
+          <div>
+            <div class="eyebrow">Automation Control Plane</div>
+            <h2>Professional visibility into reminder throughput, delivery health, and execution risk.</h2>
+            <p id="heroSummary">The command center consolidates task urgency, outbound reminder performance, and owner workload so the team can spot delivery risk before deadlines slip.</p>
+          </div>
+          <div class="hero-actions">
+            <span class="source-pill" id="currentTime">--</span>
+            <span class="status-pill sample" id="dataSourceBadge"><span class="dot"></span>Sample Data</span>
+            <button class="refresh-btn" id="refreshBtn" title="Refresh dashboard">↻</button>
+          </div>
+        </div>
+        <div class="hero-bottom" id="heroStats"></div>
+      </section>
+
+      <div id="configBanner"></div>
+
+      <section class="kpi-grid" id="summaryCards"></section>
+
+      <section class="content-grid">
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title-wrap">
+              <h3>Risk & Attention Queue</h3>
+              <p>Prioritized issues that need operator visibility.</p>
+            </div>
+            <span class="panel-count" id="riskCount">0 items</span>
+          </div>
+          <div class="risk-list" id="riskList"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title-wrap">
+              <h3>Performance Breakdown</h3>
+              <p>Live ratios for task urgency and delivery efficiency.</p>
+            </div>
+            <span class="panel-count" id="metricCount">0 metrics</span>
+          </div>
+          <div class="metric-list" id="metricList"></div>
+        </div>
+      </section>
+
+      <section class="content-grid">
+        <div class="panel">
+          <div class="panel-head">
+            <div class="panel-title-wrap">
+              <h3>Owner Workload</h3>
+              <p>Open task concentration by assignee.</p>
+            </div>
+            <span class="panel-count" id="teamCount">0 owners</span>
+          </div>
+          <div class="team-list" id="teamList"></div>
+        </div>
+
+        <div class="timeline-panel">
+          <div class="panel-head">
+            <div class="panel-title-wrap">
+              <h3>Execution Timeline</h3>
+              <p>Recent activity across trigger, filtering, delivery, and logging.</p>
+            </div>
+            <span class="panel-count" id="timelineCount">0 events</span>
+          </div>
+          <div class="timeline" id="timeline"></div>
+        </div>
+      </section>
+
+      <section class="table-panel">
+        <div class="table-head">
+          <div class="table-title-wrap">
+            <h3>Task Portfolio</h3>
+            <p>Current tracked work items with due-state classification and completion status.</p>
+          </div>
+          <span class="table-count" id="taskCount">0 tasks</span>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Task</th>
+                <th>Owner</th>
+                <th>Phone</th>
+                <th>Due State</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="tasksBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="table-panel">
+        <div class="table-head">
+          <div class="table-title-wrap">
+            <h3>Message Delivery Log</h3>
+            <p>Outbound reminder events with audit-ready timestamps and result state.</p>
+          </div>
+          <span class="table-count" id="logCount">0 entries</span>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Task</th>
+                <th>Phone</th>
+                <th>Timestamp</th>
+                <th>Delivery Result</th>
+              </tr>
+            </thead>
+            <tbody id="logsBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <div class="footer" id="lastUpdated">Last updated: --</div>
+    </main>
   </div>
 
-<script>
-// ═══════════════════════════════════════════
-//  CONFIGURATION — Set your Apps Script URL
-// ═══════════════════════════════════════════
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxFbtJhQ911l8rBHz8Kt804l4V4FVHXqZkOmCr9H5Q3GfUFiPH6wusVjC5nhnfg7EQagw/exec";
-const AUTO_REFRESH_MS = 60000; // Auto-refresh every 60 seconds
+  <script>
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxFbtJhQ911l8rBHz8Kt804l4V4FVHXqZkOmCr9H5Q3GfUFiPH6wusVjC5nhnfg7EQagw/exec";
+    const AUTO_REFRESH_MS = 60000;
 
-// ═══════════════════════════════════════════
-//  SAMPLE DATA (used when no URL is set)
-// ═══════════════════════════════════════════
-const SAMPLE_TASKS = [
-  { "Task Name":"XYZ", "Owner":"Anuj", "Phone":"918717986200", "Due Date":"2026-04-03", "Status":"Pending" },
-  { "Task Name":"Submit Report", "Owner":"Anuj", "Phone":"918717986200", "Due Date":"2026-04-04", "Status":"Pending" },
-  { "Task Name":"Fix Bug", "Owner":"Anuj", "Phone":"918717986200", "Due Date":"2026-04-03", "Status":"Completed" }
-];
-const SAMPLE_LOGS = [
-  { "Task Name":"XYZ", "Phone":"918717986200", "Timestamp":"2026-04-03 09:30", "Status":"Sent" },
-  { "Task Name":"Submit Report", "Phone":"918717986200", "Timestamp":"2026-04-03 09:30", "Status":"Sent" }
-];
+    const SAMPLE_TASKS = [
+      { "Task Name": "XYZ", "Owner": "Anuj", "Phone": "918717986200", "Due Date": "2026-04-03", "Status": "Pending" },
+      { "Task Name": "Submit Report", "Owner": "Anuj", "Phone": "918717986200", "Due Date": "2026-04-04", "Status": "Pending" },
+      { "Task Name": "Fix Bug", "Owner": "Anuj", "Phone": "918717986200", "Due Date": "2026-04-03", "Status": "Completed" }
+    ];
 
-// ═══════════════════════════════════════════
-//  STATE
-// ═══════════════════════════════════════════
-let tasks = [];
-let logs = [];
-let isLive = false;
-let refreshTimer = null;
+    const SAMPLE_LOGS = [
+      { "Task Name": "XYZ", "Phone": "918717986200", "Timestamp": "2026-04-03 09:30", "Status": "Sent" },
+      { "Task Name": "Submit Report", "Phone": "918717986200", "Timestamp": "2026-04-03 09:30", "Status": "Sent" }
+    ];
 
-// ═══════════════════════════════════════════
-//  DATA FETCHING
-// ═══════════════════════════════════════════
-async function fetchData() {
-  if (!APPS_SCRIPT_URL) {
-    tasks = SAMPLE_TASKS;
-    logs = SAMPLE_LOGS;
-    isLive = false;
-    return;
-  }
+    let tasks = [];
+    let logs = [];
+    let isLive = false;
+    let refreshTimer = null;
 
-  try {
-    const res = await fetch(APPS_SCRIPT_URL);
-    const text = await res.text();
-    const json = JSON.parse(text);
-    if (json.success) {
-      tasks = json.data.tasks || [];
-      logs = json.data.logs || [];
-      isLive = true;
-    } else {
-      throw new Error(json.error || "API error");
+    async function fetchData() {
+      if (!APPS_SCRIPT_URL) {
+        tasks = SAMPLE_TASKS;
+        logs = SAMPLE_LOGS;
+        isLive = false;
+        return;
+      }
+
+      try {
+        const response = await fetch(APPS_SCRIPT_URL);
+        const text = await response.text();
+        const json = JSON.parse(text);
+        if (json.success) {
+          tasks = json.data.tasks || [];
+          logs = json.data.logs || [];
+          isLive = true;
+        } else {
+          throw new Error(json.error || "API error");
+        }
+      } catch (error) {
+        console.error("Fetch failed:", error.message);
+        if (tasks.length === 0) {
+          tasks = SAMPLE_TASKS;
+          logs = SAMPLE_LOGS;
+        }
+        isLive = false;
+      }
     }
-  } catch (err) {
-    console.error("Fetch failed:", err.message);
-    if (tasks.length === 0) {
-      tasks = SAMPLE_TASKS;
-      logs = SAMPLE_LOGS;
+
+    function getField(obj, keys) {
+      for (const key of keys) {
+        if (obj[key] !== undefined && obj[key] !== "") return obj[key];
+      }
+      return "";
     }
-    isLive = false;
-  }
-}
 
-// ═══════════════════════════════════════════
-//  HELPERS
-// ═══════════════════════════════════════════
-function fmt(p) { return "+"+p.slice(0,2)+" "+p.slice(2,7)+" "+p.slice(7); }
-function initials(n) { return (n||"?").split(" ").map(w=>w[0]).join("").toUpperCase().slice(0,2); }
-function today() { var d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
-function tomorrow() { var d=new Date(); d.setDate(d.getDate()+1); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+    function initials(name) {
+      return (name || "?")
+        .split(" ")
+        .filter(Boolean)
+        .map(function(part) { return part[0]; })
+        .join("")
+        .toUpperCase()
+        .slice(0, 2);
+    }
 
-function dateLabel(d) {
-  if (!d) return "";
-  var ds = d.slice(0,10);
-  if (ds === today()) return "today";
-  if (ds === tomorrow()) return "tomorrow";
-  return ds < today() ? "overdue" : "future";
-}
+    function formatPhone(phone) {
+      if (!phone) return "Not available";
+      const value = String(phone).replace(/\D/g, "");
+      if (value.length < 8) return phone;
+      return "+" + value.slice(0, 2) + " " + value.slice(2, 7) + " " + value.slice(7);
+    }
 
-function getField(obj, keys) {
-  for (var k of keys) { if (obj[k] !== undefined && obj[k] !== "") return obj[k]; }
-  return "";
-}
+    function isoDate(date) {
+      const d = date || new Date();
+      return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+    }
 
-// ═══════════════════════════════════════════
-//  RENDER
-// ═══════════════════════════════════════════
-function render() {
-  var total = tasks.length;
-  var pending = tasks.filter(t => getField(t,["Status","status"]) !== "Completed").length;
-  var completed = total - pending;
-  var sent = logs.filter(l => getField(l,["Status","status"]) === "Sent").length;
-  var failed = logs.filter(l => getField(l,["Status","status"]) === "Failed").length;
+    function today() {
+      return isoDate(new Date());
+    }
 
-  // Source badge
-  var badge = document.getElementById("dataSourceBadge");
-  if (isLive) { badge.textContent="Live Data"; badge.className="data-source-badge live"; }
-  else { badge.textContent="Sample Data"; badge.className="data-source-badge sample"; }
+    function tomorrow() {
+      const d = new Date();
+      d.setDate(d.getDate() + 1);
+      return isoDate(d);
+    }
 
-  // Config banner
-  var banner = document.getElementById("configBanner");
-  if (!APPS_SCRIPT_URL) {
-    banner.innerHTML = '<div class="config-banner">⚠️ Dashboard is showing <strong>sample data</strong>. To connect live data:<br>1. Deploy <code>google-apps-script.gs</code> as a Web App from your Google Sheet<br>2. Paste the URL into <code>APPS_SCRIPT_URL</code> at the top of dashboard.html</div>';
-  } else { banner.innerHTML = ""; }
+    function dateLabel(value) {
+      if (!value) return "future";
+      const date = String(value).slice(0, 10);
+      if (date === today()) return "today";
+      if (date === tomorrow()) return "tomorrow";
+      return date < today() ? "overdue" : "future";
+    }
 
-  // Summary cards
-  var cards = [
-    {label:"Total Tasks",value:total,color:"purple",icon:"📋",sub:"All tracked tasks"},
-    {label:"Pending",value:pending,color:"yellow",icon:"⏳",sub:"Awaiting completion"},
-    {label:"Completed",value:completed,color:"green",icon:"✅",sub:"Successfully done"},
-    {label:"Messages Sent",value:sent,color:"blue",icon:"📨",sub:failed>0?failed+" failed":"WhatsApp reminders"}
-  ];
-  document.getElementById("summaryCards").innerHTML = cards.map(c =>
-    '<div class="summary-card"><div class="card-shine"></div><div class="card-header"><span class="card-label">'+c.label+'</span><div class="card-icon '+c.color+'">'+c.icon+'</div></div><div class="card-value '+c.color+'">'+c.value+'</div><div class="card-sub">'+c.sub+'</div></div>'
-  ).join("");
+    function badgeClass(status) {
+      return String(status || "Pending").trim().toLowerCase().replace(/\s+/g, "-");
+    }
 
-  // Tasks table
-  document.getElementById("taskCount").textContent = total+" tasks";
-  document.getElementById("tasksBody").innerHTML = tasks.map(t => {
-    var name = getField(t,["Task Name","TaskName","task","name"]);
-    var owner = getField(t,["Owner","owner","Assigned To"]) || "—";
-    var phone = getField(t,["Phone","phone"]);
-    var due = getField(t,["Due Date","DueDate","due_date","dueDate"]);
-    var status = getField(t,["Status","status"]);
-    var sc = status==="Completed" ? "badge-completed" : "badge-pending";
-    var dl = dateLabel(due);
-    var db = "";
-    if (dl==="today") db='<span class="badge badge-today" style="margin-left:8px;font-size:10px">Today</span>';
-    if (dl==="tomorrow") db='<span class="badge badge-tomorrow" style="margin-left:8px;font-size:10px">Tomorrow</span>';
-    if (dl==="overdue") db='<span class="badge badge-overdue" style="margin-left:8px;font-size:10px">Overdue</span>';
-    return '<tr><td><span class="task-name">'+name+'</span></td><td><div class="owner-cell"><div class="avatar">'+initials(owner)+'</div>'+owner+'</div></td><td class="phone-cell hide-mobile">'+(phone?fmt(phone):"—")+'</td><td>'+due+db+'</td><td><span class="badge '+sc+'"><span class="badge-dot"></span>'+status+'</span></td></tr>';
-  }).join("");
+    function pluralize(count, singular, plural) {
+      return count + " " + (count === 1 ? singular : (plural || singular + "s"));
+    }
 
-  // Logs table
-  document.getElementById("logCount").textContent = logs.length+" entries";
-  document.getElementById("logsBody").innerHTML = logs.map(l => {
-    var name = getField(l,["Task Name","TaskName","task","name"]);
-    var phone = getField(l,["Phone","phone"]);
-    var ts = getField(l,["Timestamp","timestamp"]);
-    var status = getField(l,["Status","status"]);
-    var sc = status==="Sent" ? "badge-sent" : "badge-failed";
-    return '<tr><td><span class="task-name">'+name+'</span></td><td class="phone-cell hide-mobile">'+(phone?fmt(phone):"—")+'</td><td>'+ts+'</td><td><span class="badge '+sc+'"><span class="badge-dot"></span>'+status+'</span></td></tr>';
-  }).join("");
+    function percent(value, total) {
+      if (!total) return 0;
+      return Math.round((value / total) * 100);
+    }
 
-  // Timeline
-  var events = [];
-  events.push({time:"09:00",text:"⏰ <strong>Daily trigger</strong> fired — workflow started",dot:""});
-  events.push({time:"09:01",text:"📊 Read <strong>"+total+" tasks</strong> from Google Sheets",dot:""});
-  if (pending < total) events.push({time:"09:01",text:"🔍 Filtered to <strong>"+pending+" active</strong> tasks ("+(completed)+" completed)",dot:""});
-  logs.forEach(function(l,i){
-    var name = getField(l,["Task Name","TaskName","task"]);
-    var status = getField(l,["Status","status"]);
-    var dot = status==="Sent"?"green":"";
-    var icon = status==="Sent"?"📱":"❌";
-    events.push({time:"09:0"+(2+i),text:icon+' WhatsApp '+status.toLowerCase()+' — Task "<strong>'+name+'</strong>"',dot:dot});
-  });
-  events.push({time:"09:0"+(2+logs.length),text:"📋 <strong>"+logs.length+" log entries</strong> written to Sheet2",dot:"blue"});
+    function escapeHtml(value) {
+      return String(value || "").replace(/[&<>"']/g, function(char) {
+        return {
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;"
+        }[char];
+      });
+    }
 
-  document.getElementById("timeline").innerHTML = events.map(function(e,i){
-    return '<div class="timeline-item" style="animation-delay:'+(.3+i*.1)+'s"><div class="timeline-dot '+e.dot+'"></div><div class="timeline-content">'+e.text+'</div><div class="timeline-time">'+e.time+' AM</div></div>';
-  }).join("");
+    function dueStateBadge(state) {
+      const label = state.charAt(0).toUpperCase() + state.slice(1);
+      return '<span class="badge ' + state + '">' + label + '</span>';
+    }
 
-  // Last updated
-  document.getElementById("lastUpdated").textContent = "Last updated: "+new Date().toLocaleTimeString()+(isLive?" · Auto-refreshing every "+AUTO_REFRESH_MS/1000+"s":" · Using sample data");
-}
+    function renderHeroStats(summary) {
+      const stats = [
+        { label: "Open tasks", value: summary.openTasks, note: pluralize(summary.pending, "pending") + " and " + pluralize(summary.overdue, "overdue") },
+        { label: "Delivery success", value: summary.successRate + "%", note: pluralize(summary.sent, "message") + " sent successfully" },
+        { label: "At-risk tasks", value: summary.atRisk, note: "Due today or already overdue" },
+        { label: "Owners engaged", value: summary.ownerCount, note: "Active assignees in current queue" }
+      ];
 
-// ═══════════════════════════════════════════
-//  REFRESH
-// ═══════════════════════════════════════════
-async function refresh() {
-  var btn = document.getElementById("refreshBtn");
-  btn.classList.add("spinning");
-  await fetchData();
-  render();
-  setTimeout(function(){ btn.classList.remove("spinning"); }, 800);
-}
+      document.getElementById("heroStats").innerHTML = stats.map(function(stat) {
+        return (
+          '<div class="hero-stat">' +
+            '<div class="hero-stat-label">' + stat.label + '</div>' +
+            '<div class="hero-stat-value">' + stat.value + '</div>' +
+            '<div class="hero-stat-note">' + stat.note + '</div>' +
+          '</div>'
+        );
+      }).join("");
+    }
 
-function updateClock() {
-  var now = new Date();
-  document.getElementById("currentTime").textContent = now.toLocaleDateString("en-IN",{weekday:"short",month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"});
-}
+    function renderSummaryCards(summary) {
+      const cards = [
+        {
+          title: "Tracked Tasks",
+          value: summary.totalTasks,
+          meta: pluralize(summary.completed, "task") + " completed across the portfolio",
+          icon: "▣",
+          tone: "brand"
+        },
+        {
+          title: "Due Today",
+          value: summary.todayCount,
+          meta: summary.tomorrowCount + " queued for tomorrow follow-up",
+          icon: "◔",
+          tone: "accent"
+        },
+        {
+          title: "Pending Work",
+          value: summary.pending,
+          meta: pluralize(summary.overdue, "item") + " already beyond due date",
+          icon: "!",
+          tone: "warn"
+        },
+        {
+          title: "Delivery Exceptions",
+          value: summary.failed,
+          meta: summary.successRate + "% delivery success across logged reminders",
+          icon: "×",
+          tone: summary.failed > 0 ? "danger" : "brand"
+        }
+      ];
 
-// ═══════════════════════════════════════════
-//  INIT
-// ═══════════════════════════════════════════
-async function init() {
-  updateClock();
-  setInterval(updateClock, 30000);
-  document.getElementById("refreshBtn").addEventListener("click", refresh);
-  await fetchData();
-  render();
-  if (APPS_SCRIPT_URL) refreshTimer = setInterval(refresh, AUTO_REFRESH_MS);
-}
+      document.getElementById("summaryCards").innerHTML = cards.map(function(card) {
+        return (
+          '<article class="kpi-card ' + card.tone + '">' +
+            '<div class="kpi-top">' +
+              '<div class="kpi-title">' + card.title + '</div>' +
+              '<div class="kpi-icon">' + card.icon + '</div>' +
+            '</div>' +
+            '<div class="kpi-value">' + card.value + '</div>' +
+            '<div class="kpi-meta">' + card.meta + '</div>' +
+          '</article>'
+        );
+      }).join("");
+    }
 
-document.addEventListener("DOMContentLoaded", init);
-</script>
+    function renderRiskList(summary) {
+      const risks = [];
+
+      if (summary.overdue > 0) {
+        risks.push({
+          title: pluralize(summary.overdue, "overdue task") + " require immediate intervention",
+          body: "These tasks have already crossed their due date and should be escalated or re-assigned before the next reminder cycle.",
+          level: "high"
+        });
+      }
+
+      if (summary.failed > 0) {
+        risks.push({
+          title: pluralize(summary.failed, "failed delivery") + " detected in audit logs",
+          body: "Review Twilio delivery response, phone formatting, and sandbox enrollment to restore reliable reminder coverage.",
+          level: "medium"
+        });
+      }
+
+      if (summary.todayCount > 0) {
+        risks.push({
+          title: pluralize(summary.todayCount, "task") + " due today",
+          body: "Monitor completion progress closely to avoid carry-forward risk at end of day.",
+          level: summary.todayCount > 3 ? "medium" : "low"
+        });
+      }
+
+      if (!risks.length) {
+        risks.push({
+          title: "No critical exceptions in the current snapshot",
+          body: "Workflow health, delivery logs, and due dates indicate a stable operating window.",
+          level: "low"
+        });
+      }
+
+      document.getElementById("riskCount").textContent = pluralize(risks.length, "item");
+      document.getElementById("riskList").innerHTML = risks.map(function(risk) {
+        const levelLabel = risk.level === "high" ? "High Risk" : risk.level === "medium" ? "Monitor" : "Stable";
+        return (
+          '<div class="risk-item">' +
+            '<div>' +
+              '<h4>' + risk.title + '</h4>' +
+              '<p>' + risk.body + '</p>' +
+            '</div>' +
+            '<span class="risk-pill ' + risk.level + '">' + levelLabel + '</span>' +
+          '</div>'
+        );
+      }).join("");
+    }
+
+    function renderMetricList(summary) {
+      const metrics = [
+        {
+          title: "Task completion ratio",
+          body: summary.completionRate + "% of tracked tasks are closed.",
+          value: summary.completionRate,
+          tone: "brand"
+        },
+        {
+          title: "Reminder delivery reliability",
+          body: summary.successRate + "% of logged reminders were sent successfully.",
+          value: summary.successRate,
+          tone: summary.failed > 0 ? "warn" : "brand"
+        },
+        {
+          title: "Urgent workload concentration",
+          body: summary.atRiskRate + "% of tasks are due today or overdue.",
+          value: summary.atRiskRate,
+          tone: summary.atRiskRate > 50 ? "danger" : summary.atRiskRate > 25 ? "warn" : "brand"
+        }
+      ];
+
+      document.getElementById("metricCount").textContent = pluralize(metrics.length, "metric");
+      document.getElementById("metricList").innerHTML = metrics.map(function(metric) {
+        return (
+          '<div class="metric-item">' +
+            '<div class="metric-row">' +
+              '<h4>' + metric.title + '</h4>' +
+              '<strong>' + metric.value + '%</strong>' +
+            '</div>' +
+            '<p>' + metric.body + '</p>' +
+            '<div class="progress ' + metric.tone + '"><span style="width:' + Math.max(metric.value, 4) + '%"></span></div>' +
+          '</div>'
+        );
+      }).join("");
+    }
+
+    function renderTeamList(ownerStats, summary) {
+      const items = ownerStats.length ? ownerStats : [{ owner: "Unassigned", open: 0, total: 0 }];
+      document.getElementById("teamCount").textContent = pluralize(ownerStats.length, "owner");
+
+      document.getElementById("teamList").innerHTML = items.map(function(item) {
+        const share = summary.openTasks ? percent(item.open, summary.openTasks) : 0;
+        return (
+          '<div class="team-item">' +
+            '<div class="team-row">' +
+              '<div>' +
+                '<h4>' + escapeHtml(item.owner) + '</h4>' +
+                '<p>' + pluralize(item.total, "task") + ' in portfolio</p>' +
+              '</div>' +
+              '<strong>' + item.open + ' open</strong>' +
+            '</div>' +
+            '<div class="progress ' + (share > 45 ? "warn" : "brand") + '"><span style="width:' + Math.max(share, 6) + '%"></span></div>' +
+          '</div>'
+        );
+      }).join("");
+    }
+
+    function renderTasksTable() {
+      document.getElementById("taskCount").textContent = pluralize(tasks.length, "task");
+      document.getElementById("tasksBody").innerHTML = tasks.map(function(task) {
+        const name = getField(task, ["Task Name", "TaskName", "task", "name"]) || "Untitled task";
+        const owner = getField(task, ["Owner", "owner", "Assigned To"]) || "Unassigned";
+        const phone = getField(task, ["Phone", "phone"]);
+        const dueDate = getField(task, ["Due Date", "DueDate", "due_date", "dueDate"]);
+        const status = getField(task, ["Status", "status"]) || "Pending";
+        const state = dateLabel(dueDate);
+
+        return (
+          "<tr>" +
+            "<td>" +
+              '<span class="task-name">' + escapeHtml(name) + "</span>" +
+              '<span class="task-sub">Due ' + escapeHtml(dueDate || "not scheduled") + "</span>" +
+            "</td>" +
+            "<td>" +
+              '<div class="owner-cell"><span class="avatar">' + initials(owner) + "</span>" +
+              "<div><span class=\"task-name\">" + escapeHtml(owner) + "</span><span class=\"task-sub\">Primary owner</span></div></div>" +
+            "</td>" +
+            '<td class="mono">' + escapeHtml(formatPhone(phone)) + "</td>" +
+            "<td>" + dueStateBadge(state) + "</td>" +
+            '<td><span class="badge ' + badgeClass(status) + '">' + escapeHtml(status) + "</span></td>" +
+          "</tr>"
+        );
+      }).join("");
+    }
+
+    function renderLogsTable() {
+      document.getElementById("logCount").textContent = pluralize(logs.length, "entry", "entries");
+      document.getElementById("logsBody").innerHTML = logs.map(function(log) {
+        const name = getField(log, ["Task Name", "TaskName", "task", "name"]) || "Unknown task";
+        const phone = getField(log, ["Phone", "phone"]);
+        const timestamp = getField(log, ["Timestamp", "timestamp"]) || "Not available";
+        const status = getField(log, ["Status", "status"]) || "Sent";
+
+        return (
+          "<tr>" +
+            "<td>" +
+              '<span class="task-name">' + escapeHtml(name) + "</span>" +
+              '<span class="task-sub">Reminder event</span>' +
+            "</td>" +
+            '<td class="mono">' + escapeHtml(formatPhone(phone)) + "</td>" +
+            '<td class="mono">' + escapeHtml(timestamp) + "</td>" +
+            '<td><span class="badge ' + badgeClass(status) + '">' + escapeHtml(status) + "</span></td>" +
+          "</tr>"
+        );
+      }).join("");
+    }
+
+    function renderTimeline(summary) {
+      const timeline = [
+        { icon: "◌", text: "Daily schedule trigger initialized the reminder workflow.", time: "09:00" },
+        { icon: "▣", text: "Task registry loaded with " + pluralize(summary.totalTasks, "record") + ".", time: "09:01" },
+        { icon: "◔", text: pluralize(summary.pending, "active task") + " remained after completion filtering.", time: "09:02" }
+      ];
+
+      if (summary.todayCount > 0 || summary.overdue > 0) {
+        timeline.push({
+          icon: "!",
+          text: pluralize(summary.todayCount + summary.overdue, "task") + " entered the attention window for today.",
+          time: "09:03"
+        });
+      }
+
+      logs.slice(0, 4).forEach(function(log, index) {
+        const status = getField(log, ["Status", "status"]) || "Sent";
+        const taskName = getField(log, ["Task Name", "TaskName", "task"]) || "Unknown task";
+        timeline.push({
+          icon: status === "Sent" ? "↗" : "×",
+          text: 'Delivery ' + status.toLowerCase() + ' for "' + escapeHtml(taskName) + '".',
+          time: "09:0" + (4 + index)
+        });
+      });
+
+      timeline.push({
+        icon: "✓",
+        text: pluralize(logs.length, "audit log") + " written to the message ledger.",
+        time: "09:10"
+      });
+
+      document.getElementById("timelineCount").textContent = pluralize(timeline.length, "event");
+      document.getElementById("timeline").innerHTML = timeline.map(function(item) {
+        return (
+          '<div class="timeline-item">' +
+            '<div class="timeline-icon">' + item.icon + '</div>' +
+            '<div><p>' + item.text + '</p></div>' +
+            '<div class="timeline-time">' + item.time + '</div>' +
+          '</div>'
+        );
+      }).join("");
+    }
+
+    function render() {
+      const totalTasks = tasks.length;
+      const completed = tasks.filter(function(task) {
+        return String(getField(task, ["Status", "status"])).toLowerCase() === "completed";
+      }).length;
+      const pending = totalTasks - completed;
+      const todayCount = tasks.filter(function(task) {
+        return dateLabel(getField(task, ["Due Date", "DueDate", "due_date", "dueDate"])) === "today";
+      }).length;
+      const tomorrowCount = tasks.filter(function(task) {
+        return dateLabel(getField(task, ["Due Date", "DueDate", "due_date", "dueDate"])) === "tomorrow";
+      }).length;
+      const overdue = tasks.filter(function(task) {
+        return dateLabel(getField(task, ["Due Date", "DueDate", "due_date", "dueDate"])) === "overdue";
+      }).length;
+      const sent = logs.filter(function(log) {
+        return String(getField(log, ["Status", "status"])).toLowerCase() === "sent";
+      }).length;
+      const failed = logs.filter(function(log) {
+        return String(getField(log, ["Status", "status"])).toLowerCase() === "failed";
+      }).length;
+
+      const ownerMap = {};
+      tasks.forEach(function(task) {
+        const owner = getField(task, ["Owner", "owner", "Assigned To"]) || "Unassigned";
+        const status = String(getField(task, ["Status", "status"]) || "Pending").toLowerCase();
+        if (!ownerMap[owner]) ownerMap[owner] = { owner: owner, open: 0, total: 0 };
+        ownerMap[owner].total += 1;
+        if (status !== "completed") ownerMap[owner].open += 1;
+      });
+
+      const ownerStats = Object.values(ownerMap).sort(function(a, b) { return b.open - a.open || b.total - a.total; }).slice(0, 5);
+      const summary = {
+        totalTasks: totalTasks,
+        completed: completed,
+        pending: pending,
+        todayCount: todayCount,
+        tomorrowCount: tomorrowCount,
+        overdue: overdue,
+        sent: sent,
+        failed: failed,
+        ownerCount: Object.keys(ownerMap).length,
+        openTasks: pending,
+        atRisk: todayCount + overdue,
+        successRate: percent(sent, logs.length || sent + failed),
+        completionRate: percent(completed, totalTasks),
+        atRiskRate: percent(todayCount + overdue, totalTasks)
+      };
+
+      const sourceBadge = document.getElementById("dataSourceBadge");
+      sourceBadge.className = "status-pill " + (isLive ? "live" : "sample");
+      sourceBadge.innerHTML = '<span class="dot"></span>' + (isLive ? "Live Data" : "Sample Data");
+
+      document.getElementById("navDataMode").textContent = isLive ? "Live" : "Sample";
+      document.getElementById("workflowState").textContent = isLive ? "Live monitoring" : "Fallback mode";
+      document.getElementById("refreshCadence").textContent = AUTO_REFRESH_MS / 1000 + " sec";
+      document.getElementById("navDueToday").textContent = todayCount;
+      document.getElementById("navOverdue").textContent = overdue;
+      document.getElementById("navSuccessRate").textContent = summary.successRate + "%";
+
+      document.getElementById("sidebarGuidance").textContent = isLive
+        ? "Live telemetry is active. Use the attention queue to handle overdue items and delivery exceptions before the next cycle."
+        : "Dashboard is in fallback mode. Connect the Apps Script endpoint to replace sample records with live operational telemetry.";
+
+      document.getElementById("heroSummary").textContent =
+        "The command center currently tracks " + totalTasks + " tasks across " + summary.ownerCount +
+        " owners, with " + summary.atRisk + " items in the active attention window and a " + summary.successRate +
+        "% reminder delivery success rate.";
+
+      const banner = document.getElementById("configBanner");
+      banner.innerHTML = "";
+      if (!APPS_SCRIPT_URL) {
+        banner.innerHTML =
+          '<div class="config-banner">This dashboard is currently showing <strong>sample data</strong>. To switch to live operations: deploy <code>google-apps-script.gs</code> as a web app from your Google Sheet, then paste the deployment URL into <code>APPS_SCRIPT_URL</code> inside <code>index.html</code>.</div>';
+      }
+
+      renderHeroStats(summary);
+      renderSummaryCards(summary);
+      renderRiskList(summary);
+      renderMetricList(summary);
+      renderTeamList(ownerStats, summary);
+      renderTasksTable();
+      renderLogsTable();
+      renderTimeline(summary);
+
+      document.getElementById("lastUpdated").innerHTML =
+        'Last updated: ' + new Date().toLocaleString("en-IN", {
+          weekday: "short",
+          day: "2-digit",
+          month: "short",
+          hour: "2-digit",
+          minute: "2-digit"
+        }) + (isLive ? " • Auto-refresh active" : " • Sample mode") +
+        ' • Built for <a href="https://cymasoniclabs.com/" target="_blank" rel="noopener noreferrer">Cymasonic Labs</a>';
+    }
+
+    async function refresh() {
+      const button = document.getElementById("refreshBtn");
+      button.classList.add("spinning");
+      await fetchData();
+      render();
+      setTimeout(function() {
+        button.classList.remove("spinning");
+      }, 800);
+    }
+
+    function updateClock() {
+      document.getElementById("currentTime").textContent = new Date().toLocaleString("en-IN", {
+        weekday: "short",
+        day: "2-digit",
+        month: "short",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    }
+
+    async function init() {
+      updateClock();
+      setInterval(updateClock, 30000);
+      document.getElementById("refreshBtn").addEventListener("click", refresh);
+      await fetchData();
+      render();
+      if (APPS_SCRIPT_URL) refreshTimer = setInterval(refresh, AUTO_REFRESH_MS);
+    }
+
+    document.addEventListener("DOMContentLoaded", init);
+  </script>
 </body>
 </html>
