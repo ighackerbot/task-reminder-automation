@@ -358,3 +358,40 @@ function render() {
   document.getElementById("timeline").innerHTML = events.map(function(e,i){
     return '<div class="timeline-item" style="animation-delay:'+(.3+i*.1)+'s"><div class="timeline-dot '+e.dot+'"></div><div class="timeline-content">'+e.text+'</div><div class="timeline-time">'+e.time+' AM</div></div>';
   }).join("");
+
+  // Last updated
+  document.getElementById("lastUpdated").textContent = "Last updated: "+new Date().toLocaleTimeString()+(isLive?" · Auto-refreshing every "+AUTO_REFRESH_MS/1000+"s":" · Using sample data");
+}
+
+// ═══════════════════════════════════════════
+//  REFRESH
+// ═══════════════════════════════════════════
+async function refresh() {
+  var btn = document.getElementById("refreshBtn");
+  btn.classList.add("spinning");
+  await fetchData();
+  render();
+  setTimeout(function(){ btn.classList.remove("spinning"); }, 800);
+}
+
+function updateClock() {
+  var now = new Date();
+  document.getElementById("currentTime").textContent = now.toLocaleDateString("en-IN",{weekday:"short",month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"});
+}
+
+// ═══════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════
+async function init() {
+  updateClock();
+  setInterval(updateClock, 30000);
+  document.getElementById("refreshBtn").addEventListener("click", refresh);
+  await fetchData();
+  render();
+  if (APPS_SCRIPT_URL) refreshTimer = setInterval(refresh, AUTO_REFRESH_MS);
+}
+
+document.addEventListener("DOMContentLoaded", init);
+</script>
+</body>
+</html>
